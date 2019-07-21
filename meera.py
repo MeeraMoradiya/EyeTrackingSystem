@@ -71,7 +71,7 @@ def letter(letter_index, text, letter_light):
     #if letter_light is True:
     #    cv2.rectangle(keyboard, (x + th, y + th), (x + width - th, y + height - th), (255, 255, 255), -1)
     #else:
-    #    cv2.rectangle(keyboard, (x + th, y + th), (x + width - th, y + height - th), (255, 0, 0), th)
+    cv2.rectangle(keyboard, (x + th, y + th), (x + width - th, y + height - th), (255, 0, 0), th)
 
     # Text settings
     font_letter = cv2.FONT_HERSHEY_PLAIN
@@ -104,7 +104,7 @@ while True:
     frames += 1
     
     text = ""
-    drag = 28
+    drag = 30
     if gaze.is_blinking():
         text = "Blinking"
         #pag.click(button='left')
