@@ -7,8 +7,11 @@ from math import hypot
 from numpy import array
 import subprocess
 
-cap = cv2.VideoCapture(0)
+
 gaze = GazeTracking()
+webcam = cv2.VideoCapture(0)
+board = np.zeros((300, 1400), np.uint8)
+board[:] = 255
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
 first_frame=None
@@ -18,8 +21,10 @@ first_frame=None
 keyboard = np.zeros((600, 1000, 3), np.uint8)
 keys_set_1 = {0: "Q", 1: "W", 2: "E", 3: "R", 4: "T",
               5: "A", 6: "S", 7: "D", 8: "F", 9: "G",
-              10: "Z", 11: "X", 12: "C", 13: "V", 14: "B"}
-              
+              10: "Z", 11: "X", 12: "C", 13: "V", 14: "<"}
+keys_set_2 = {0: "Y", 1: "U", 2: "I", 3: "O", 4: "P",
+              5: "H", 6: "J", 7: "K", 8: "L", 9: "_",
+              10: "V", 11: "B", 12: "N", 13: "M", 14: "<"}
 
               
 def direction(nose_point, anchor_point, w, h, multiple=1):
@@ -104,6 +109,14 @@ def letter(letter_index, text, letter_light):
 
 def midpoint(p1 ,p2):
     return int((p1.x + p2.x)/2), int((p1.y + p2.y)/2)
+    
+def draw_menu():
+    rows, cols, _ = keyboard.shape
+    th_lines = 4 # thickness lines
+    cv2.line(keyboard, (int(cols/2) - int(th_lines/2), 0),(int(cols/2) - int(th_lines/2), rows),
+             (51, 51, 51), th_lines)
+    cv2.putText(keyboard, "LEFT", (80, 300), font, 6, (255, 255, 255), 5)
+    cv2.putText(keyboard, "RIGHT", (80 + int(cols/2), 300), font, 6, (255, 255, 255), 5)
 
 font = cv2.FONT_HERSHEY_PLAIN
 
@@ -164,22 +177,26 @@ frames = 0
 letter_index = 0
 
 while True:
-    _, frame = cap.read()
-    #frame = cv2.resize(frame, None, fx=0.5, fy=0.5)
-    
-   
+    # We get a new frame from the webcam
+    _, frame = webcam.read()
+
     # We send this frame to GazeTracking to analyze it
     gaze.refresh(frame)
-   
-    keyboard[:] = (0, 0, 0)
-    frames += 1
-    new_frame = np.zeros((500, 500, 3), np.uint8)
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
+
     if first_frame is None:
         first_frame=frame
         frame_eye = array(gaze.frame_left_coords(first_frame))
-        continue 
+        continue     
+
+    frame = gaze.annotated_frame()
+    
+    keyboard[:] = (0, 0, 0)
+    frames += 1
+   
+    new_frame = np.zeros((500, 500, 3), np.uint8)
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+   
 
     faces = detector(gray)
     for face in faces:
