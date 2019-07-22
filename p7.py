@@ -4,17 +4,22 @@ import dlib
 from gaze_tracking import GazeTracking
 import pyautogui as pag
 from math import hypot
+import subprocess
 
 cap = cv2.VideoCapture(0)
 gaze = GazeTracking()
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+#subprocess.Popen('C:\\Windows\\System32\\calc.exe')
 
 # Keyboard settings
 keyboard = np.zeros((600, 1000, 3), np.uint8)
 keys_set_1 = {0: "Q", 1: "W", 2: "E", 3: "R", 4: "T",
               5: "A", 6: "S", 7: "D", 8: "F", 9: "G",
               10: "Z", 11: "X", 12: "C", 13: "V", 14: "B"}
+              
+              
+
 
 def letter(letter_index, text, letter_light):
     # Keys
@@ -177,18 +182,31 @@ while True:
         gaze_ratio_right_eye = get_gaze_ratio([42, 43, 44, 45, 46, 47], landmarks)
         gaze_ratio = (gaze_ratio_right_eye + gaze_ratio_left_eye) / 2
 
-
-        drag=32
+       
+        drag=12
+        
+        if gaze.is_blinking():
+        #text = "Blinking"
+            #pag.click(button='left')
+        
         if gaze_ratio <= 1:
             cv2.putText(frame, "RIGHT", (50, 100), font, 2, (0, 0, 255), 3)
             pag.moveRel(drag, 0)
             new_frame[:] = (0, 0, 255)
         elif 1 < gaze_ratio < 1.7:
             cv2.putText(frame, "CENTER", (50, 100), font, 2, (0, 0, 255), 3)
+            pag.mouseDown()
         else:
             new_frame[:] = (255, 0, 0)
             pag.moveRel(-drag, 0)
             cv2.putText(frame, "LEFT", (50, 100), font, 2, (0, 0, 255), 3)
+        
+        #if gaze.is_up():
+        #    cv2.putText(frame, "UP", (500, 100), font, 2, (0, 0, 255), 3)
+        #    pag.moveRel(0, drag)
+        #elif gaze.is_down():
+        #    cv2.putText(frame, "Down", (500, 100), font, 2, (0, 0, 255), 3)
+        #    pag.moveRel(0, -drag)
 
 
     # Letters
@@ -209,13 +227,16 @@ while True:
 
 
     cv2.imshow("Frame", frame)
+   
+    
+
    # cv2.imshow("New frame", new_frame)
     cv2.imshow("Virtual keyboard", keyboard)
    # cv2.putText(frame, text, (90, 60), cv2.FONT_HERSHEY_DUPLEX, 1.6, (147, 58, 31), 2)
 
     left_pupil = gaze.pupil_left_coords()
     right_pupil = gaze.pupil_right_coords()
-    
+     
     
     cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
     cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)

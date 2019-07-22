@@ -16,6 +16,8 @@ keys_set_1 = {0: "Q", 1: "W", 2: "E", 3: "R", 4: "T",
               5: "A", 6: "S", 7: "D", 8: "F", 9: "G",
               10: "Z", 11: "X", 12: "C", 13: "V", 14: "B"}
               
+
+              
               
 def letter(letter_index, text, letter_light):
     # Keys
@@ -104,16 +106,16 @@ while True:
     frames += 1
     
     text = ""
-    drag = 30
+    drag = 12
     if gaze.is_blinking():
         text = "Blinking"
         #pag.click(button='left')
     elif gaze.is_right():
         text = "Looking right"
-        pag.moveRel(drag, 0)
+      #  pag.moveRel(drag, 0)
     elif gaze.is_left():
         text = "Looking left"
-        pag.moveRel(-drag, 0)
+       # pag.moveRel(-drag, 0)
     elif gaze.is_up():
         text = "Looking Up"
     elif gaze.is_down():
@@ -125,12 +127,14 @@ while True:
 
     left_pupil = gaze.pupil_left_coords()
     right_pupil = gaze.pupil_right_coords()
+    w, h = 60, 35
+    #dir = direction(left_pupil, frame_eye, w, h)
     
     
     cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
     cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
     
-    cv2.putText(frame, "First point: " + str(frame_eye), (90, 255), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
+    cv2.putText(frame, "First point: " + str(dir), (90, 255), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
     
    
    
@@ -152,7 +156,7 @@ while True:
 
    
     cv2.imshow("Demo", frame)
-    cv2.imshow("Virtual keyboard", keyboard)
+    #cv2.imshow("Virtual keyboard", keyboard)
    
 
     if cv2.waitKey(1) == 27:
