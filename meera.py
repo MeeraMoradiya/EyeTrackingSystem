@@ -7,17 +7,32 @@ import cv2
 from gaze_tracking import GazeTracking
 import pyautogui as pag
 import numpy as np
+from numpy import array
 
 gaze = GazeTracking()
 webcam = cv2.VideoCapture(0)
 first_frame=None
+
+
 keyboard = np.zeros((600, 1000, 3), np.uint8)
 keys_set_1 = {0: "Q", 1: "W", 2: "E", 3: "R", 4: "T",
               5: "A", 6: "S", 7: "D", 8: "F", 9: "G",
               10: "Z", 11: "X", 12: "C", 13: "V", 14: "B"}
               
 
-              
+def direction(nose_point, anchor_point, w, h, multiple=1):
+    
+    nx=nose_point[0]
+    ny=nose_point[1]
+    x=anchor_point[0]
+    y=anchor_point[1]
+    
+    if ny > y + multiple * h:
+        return 'down'
+    elif ny < y - multiple * h:
+        return 'up'
+
+    return '-'              
               
 def letter(letter_index, text, letter_light):
     # Keys
@@ -97,7 +112,7 @@ while True:
 
     if first_frame is None:
         first_frame=frame
-        frame_eye = gaze.frame_left_coords(first_frame)
+        frame_eye = array(gaze.frame_left_coords(first_frame))
         continue     
 
     frame = gaze.annotated_frame()
@@ -111,7 +126,7 @@ while True:
         text = "Blinking"
         #pag.click(button='left')
     elif gaze.is_right():
-        text = "Looking right"
+        text = "Looking right"  
       #  pag.moveRel(drag, 0)
     elif gaze.is_left():
         text = "Looking left"
@@ -125,16 +140,25 @@ while True:
 
     cv2.putText(frame, text, (90, 60), cv2.FONT_HERSHEY_DUPLEX, 1.6, (147, 58, 31), 2)
 
-    left_pupil = gaze.pupil_left_coords()
-    right_pupil = gaze.pupil_right_coords()
-    w, h = 60, 35
-    #dir = direction(left_pupil, frame_eye, w, h)
+    left_pupil = array(gaze.pupil_left_coords())
+    right_pupil = array(gaze.pupil_right_coords())
+    w, h = 8, 8
+    dir1=""
+    if left_pupil.size > 1 and right_pupil.size > 1:
+        midpointx=(left_pupil[0]+right_pupil[0])/2
+        midpointy=(left_pupil[1]+right_pupil[1])/2
+    
+        mid_point=array([midpointx,midpointy])
+    
+    if mid_point.size > 1 :
+        dir1 = direction(mid_point, frame_eye, w, h)
     
     
     cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
     cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
     
-    cv2.putText(frame, "First point: " + str(dir), (90, 255), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
+   
+    cv2.putText(frame, "direction: " + str(dir1), (90, 255), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
     
    
    

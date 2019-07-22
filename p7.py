@@ -18,6 +18,23 @@ keys_set_1 = {0: "Q", 1: "W", 2: "E", 3: "R", 4: "T",
               5: "A", 6: "S", 7: "D", 8: "F", 9: "G",
               10: "Z", 11: "X", 12: "C", 13: "V", 14: "B"}
               
+
+              
+def direction(nose_point, anchor_point, w, h, multiple=1):
+    nx, ny = nose_point
+    x, y = anchor_point
+
+    if nx > x + multiple * w:
+        return 'right'
+    elif nx < x - multiple * w:
+        return 'left'
+
+    if ny > y + multiple * h:
+        return 'down'
+    elif ny < y - multiple * h:
+        return 'up'
+
+    return '-'
               
 
 
@@ -185,9 +202,7 @@ while True:
        
         drag=12
         
-        if gaze.is_blinking():
-        #text = "Blinking"
-            #pag.click(button='left')
+       
         
         if gaze_ratio <= 1:
             cv2.putText(frame, "RIGHT", (50, 100), font, 2, (0, 0, 255), 3)
@@ -231,7 +246,7 @@ while True:
     
 
    # cv2.imshow("New frame", new_frame)
-    cv2.imshow("Virtual keyboard", keyboard)
+   # cv2.imshow("Virtual keyboard", keyboard)
    # cv2.putText(frame, text, (90, 60), cv2.FONT_HERSHEY_DUPLEX, 1.6, (147, 58, 31), 2)
 
     left_pupil = gaze.pupil_left_coords()
