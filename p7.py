@@ -303,5 +303,5 @@ while True:
     if key == 27:
         break
 
-cap.release()
+webcam.release()
 cv2.destroyAllWindows()
