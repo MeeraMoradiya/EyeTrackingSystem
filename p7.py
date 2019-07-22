@@ -4,12 +4,14 @@ import dlib
 from gaze_tracking import GazeTracking
 import pyautogui as pag
 from math import hypot
+from numpy import array
 import subprocess
 
 cap = cv2.VideoCapture(0)
 gaze = GazeTracking()
 detector = dlib.get_frontal_face_detector()
 predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+first_frame=None
 #subprocess.Popen('C:\\Windows\\System32\\calc.exe')
 
 # Keyboard settings
@@ -21,20 +23,18 @@ keys_set_1 = {0: "Q", 1: "W", 2: "E", 3: "R", 4: "T",
 
               
 def direction(nose_point, anchor_point, w, h, multiple=1):
-    nx, ny = nose_point
-    x, y = anchor_point
-
-    if nx > x + multiple * w:
-        return 'right'
-    elif nx < x - multiple * w:
-        return 'left'
-
+    
+    nx=nose_point[0]
+    ny=nose_point[1]
+    x=anchor_point[0]
+    y=anchor_point[1]
+    
     if ny > y + multiple * h:
-        return 'down'
+        return 'DOWN'
     elif ny < y - multiple * h:
-        return 'up'
+        return 'UP'
 
-    return '-'
+    return '-' 
               
 
 
@@ -165,7 +165,7 @@ letter_index = 0
 
 while True:
     _, frame = cap.read()
-    frame = cv2.resize(frame, None, fx=0.5, fy=0.5)
+    #frame = cv2.resize(frame, None, fx=0.5, fy=0.5)
     
    
     # We send this frame to GazeTracking to analyze it
@@ -175,7 +175,11 @@ while True:
     frames += 1
     new_frame = np.zeros((500, 500, 3), np.uint8)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-  
+    
+    if first_frame is None:
+        first_frame=frame
+        frame_eye = array(gaze.frame_left_coords(first_frame))
+        continue 
 
     faces = detector(gray)
     for face in faces:
@@ -202,19 +206,46 @@ while True:
        
         drag=12
         
-       
         
+            
+        left_pupil = array(gaze.pupil_left_coords())
+        right_pupil = array(gaze.pupil_right_coords())
+        w, h = 8, 8
+        dir1=""
+        mid_point=array([900,900])
+        if left_pupil.size > 1 and right_pupil.size > 1:
+            midpointx=(left_pupil[0]+right_pupil[0])/2
+            midpointy=(left_pupil[1]+right_pupil[1])/2
+        
+            mid_point=array([midpointx,midpointy])
+        
+        if mid_point.size > 1 :
+            dir1 = direction(mid_point, frame_eye, w, h)
+            
+            
+            
         if gaze_ratio <= 1:
             cv2.putText(frame, "RIGHT", (50, 100), font, 2, (0, 0, 255), 3)
             pag.moveRel(drag, 0)
             new_frame[:] = (0, 0, 255)
-        elif 1 < gaze_ratio < 1.7:
-            cv2.putText(frame, "CENTER", (50, 100), font, 2, (0, 0, 255), 3)
-            pag.mouseDown()
-        else:
+        elif gaze_ratio > 1.7:
             new_frame[:] = (255, 0, 0)
             pag.moveRel(-drag, 0)
             cv2.putText(frame, "LEFT", (50, 100), font, 2, (0, 0, 255), 3)
+        if dir1 == 'UP' :
+            pag.moveRel(0, -drag)
+            cv2.putText(frame, "UP", (150, 100), font, 2, (0, 0, 255), 3)
+        elif dir1 == 'DOWN' :
+            pag.moveRel(0, drag)
+            cv2.putText(frame, "DOWN", (150, 100), font, 2, (0, 0, 255), 3)
+        
+       
+        
+         
+     
+        cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
+        cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
+        cv2.putText(frame, "direction: " + str(dir1), (90, 255), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
         
         #if gaze.is_up():
         #    cv2.putText(frame, "UP", (500, 100), font, 2, (0, 0, 255), 3)
@@ -249,12 +280,6 @@ while True:
    # cv2.imshow("Virtual keyboard", keyboard)
    # cv2.putText(frame, text, (90, 60), cv2.FONT_HERSHEY_DUPLEX, 1.6, (147, 58, 31), 2)
 
-    left_pupil = gaze.pupil_left_coords()
-    right_pupil = gaze.pupil_right_coords()
-     
-    
-    cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
-    cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
     
 
     key = cv2.waitKey(1)
