@@ -184,6 +184,11 @@ frames = 0
 letter_index_i = 0
 letter_index_j = 0
 keyboard_selection_frames = 0
+blinking_frames = 0
+frames_to_blink=6
+
+
+text=""
 
 while True:
     # We get a new frame from the webcam
@@ -292,8 +297,22 @@ while True:
             #pag.moveRel(0, drag)
             #cv2.putText(frame, "DOWN", (150, 100), font, 2, (0, 0, 255), 3)
         
-       
-        
+        if blinking_ratio > 5:
+            # cv2.putText(frame, "BLINKING", (50, 150), font, 4, (255, 0, 0), thickness=3)
+            blinking_frames += 1
+            frames -= 1
+
+                # Typing letter
+            if blinking_frames == frames_to_blink:
+                if active_letter != "<" and active_letter != "_":
+                    text += active_letter
+                if active_letter == "_":
+                    text += " "
+                    select_keyboard_menu = True
+                    # time.sleep(1)
+            else:
+                    blinking_frames = 0
+            
          
      
         cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
@@ -323,11 +342,14 @@ while True:
             else:
                 light = False
             letter(i,j, key_arr_1[i][j], light)
-
+            
+     # Show the text we're writing on the board
+    cv2.putText(board, text, (80, 100), font, 9, 0, 3)
 
 
     cv2.imshow("Frame", frame)
     cv2.imshow("Virtual keyboard", keyboard)
+    cv2.imshow("Board", board)
    
     
 
