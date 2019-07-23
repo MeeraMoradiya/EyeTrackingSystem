@@ -19,12 +19,14 @@ first_frame=None
 
 # Keyboard settings
 keyboard = np.zeros((600, 1000, 3), np.uint8)
-keys_set_1 = {0: "Q", 1: "W", 2: "E", 3: "R", 4: "T",
-              5: "A", 6: "S", 7: "D", 8: "F", 9: "G",
-              10: "Z", 11: "X", 12: "C", 13: "V", 14: "<"}
-keys_set_2 = {0: "Y", 1: "U", 2: "I", 3: "O", 4: "P",
-              5: "H", 6: "J", 7: "K", 8: "L", 9: "_",
-              10: "V", 11: "B", 12: "N", 13: "M", 14: "<"}
+key_arr_1=np.array([("Q","W","E","R","T"),("A","S","D","F","G"),( "Z","X", "C","V","<")])
+key_arr_2=np.array([("Y","U","I","O","P"),("H","J","K","L","_"),( "V","B", "N","M","<")])
+#keys_set_1 = {0: "Q", 1: "W", 2: "E", 3: "R", 4: "T",
+#              5: "A", 6: "S", 7: "D", 8: "F", 9: "G",
+#              10: "Z", 11: "X", 12: "C", 13: "V", 14: "<"}
+#keys_set_2 = {0: "Y", 1: "U", 2: "I", 3: "O", 4: "P",
+#              5: "H", 6: "J", 7: "K", 8: "L", 9: "_",
+#              10: "V", 11: "B", 12: "N", 13: "M", 14: "<"}
 
               
 def direction(nose_point, anchor_point, w, h, multiple=1):
@@ -43,51 +45,51 @@ def direction(nose_point, anchor_point, w, h, multiple=1):
               
 
 
-def letter(letter_index, text, letter_light):
+def letter(letter_index_i,letter_index_j, text, letter_light):
     # Keys
-    if letter_index == 0:
+    if letter_index_i == 0 and letter_index_j==0:
         x = 0
         y = 0
-    elif letter_index == 1:
+    elif letter_index_i == 0 and letter_index_j==1:
         x = 200
         y = 0
-    elif letter_index == 2:
+    elif letter_index_i == 0 and letter_index_j==2:
         x = 400
         y = 0
-    elif letter_index == 3:
+    elif letter_index_i == 0 and letter_index_j==3:
         x = 600
         y = 0
-    elif letter_index == 4:
+    elif letter_index_i == 0 and letter_index_j==4:
         x = 800
         y = 0
-    elif letter_index == 5:
+    elif letter_index_i == 1 and letter_index_j==0:
         x = 0
         y = 200
-    elif letter_index == 6:
+    elif letter_index_i == 1 and letter_index_j==1:
         x = 200
         y = 200
-    elif letter_index == 7:
+    elif letter_index_i == 1 and letter_index_j==2:
         x = 400
         y = 200
-    elif letter_index == 8:
+    elif letter_index_i == 1 and letter_index_j==3:
         x = 600
         y = 200
-    elif letter_index == 9:
+    elif letter_index_i == 1 and letter_index_j==4:
         x = 800
         y = 200
-    elif letter_index == 10:
+    elif letter_index_i == 2 and letter_index_j==0:
         x = 0
         y = 400
-    elif letter_index == 11:
+    elif letter_index_i == 2 and letter_index_j==1:
         x = 200
         y = 400
-    elif letter_index == 12:
+    elif letter_index_i == 2 and letter_index_j==2:
         x = 400
         y = 400
-    elif letter_index == 13:
+    elif letter_index_i == 2 and letter_index_j==3:
         x = 600
         y = 400
-    elif letter_index == 14:
+    elif letter_index_i == 2 and letter_index_j==4:
         x = 800
         y = 400
 
@@ -95,7 +97,7 @@ def letter(letter_index, text, letter_light):
     height = 200
     th = 3 # thickness
    
-    cv2.rectangle(keyboard, (x + th, y + th), (x + width - th, y + height - th), (255, 0, 0), th)
+    
 
     # Text settings
     font_letter = cv2.FONT_HERSHEY_PLAIN
@@ -105,7 +107,12 @@ def letter(letter_index, text, letter_light):
     width_text, height_text = text_size[0], text_size[1]
     text_x = int((width - width_text) / 2) + x
     text_y = int((height + height_text) / 2) + y
-    cv2.putText(keyboard, text, (text_x, text_y), font_letter, font_scale, (255, 0, 0), font_th)
+    if letter_light is True:
+        cv2.rectangle(keyboard, (x + th, y + th), (x + width - th, y + height - th), (255, 255, 255), -1)
+        cv2.putText(keyboard, text, (text_x, text_y), font_letter, font_scale, (51, 51, 51), font_th)
+    else:
+        cv2.rectangle(keyboard, (x + th, y + th), (x + width - th, y + height - th), (51, 51, 51), -1)
+        cv2.putText(keyboard, text, (text_x, text_y), font_letter, font_scale, (255, 255, 255), font_th)
 
 def midpoint(p1 ,p2):
     return int((p1.x + p2.x)/2), int((p1.y + p2.y)/2)
@@ -174,7 +181,9 @@ def get_gaze_ratio(eye_points, facial_landmarks):
 
 # Counters
 frames = 0
-letter_index = 0
+letter_index_i = 0
+letter_index_j = 0
+keyboard_selection_frames = 0
 
 while True:
     # We get a new frame from the webcam
@@ -242,19 +251,46 @@ while True:
             
             
         if gaze_ratio <= 1:
-            cv2.putText(frame, "RIGHT", (50, 100), font, 2, (0, 0, 255), 3)
-            pag.moveRel(drag, 0)
-            new_frame[:] = (0, 0, 255)
+            keyboard_selection_frames += 1
+            # If Kept gaze on one side more than 15 frames, move to keyboard
+            if keyboard_selection_frames == 9:
+                cv2.putText(frame, "RIGHT", (50, 100), font, 2, (0, 0, 255), 3)
+                if letter_index_j < 5:
+                    letter_index_j +=1
+                keyboard_selection_frames=0
+            #pag.moveRel(drag, 0)
+            #new_frame[:] = (0, 0, 255)
         elif gaze_ratio > 1.7:
-            new_frame[:] = (255, 0, 0)
-            pag.moveRel(-drag, 0)
-            cv2.putText(frame, "LEFT", (50, 100), font, 2, (0, 0, 255), 3)
+            keyboard_selection_frames += 1
+            # If Kept gaze on one side more than 15 frames, move to keyboard
+            if keyboard_selection_frames == 9:
+                cv2.putText(frame, "LEFT", (50, 100), font, 2, (0, 0, 255), 3)
+                if letter_index_j > 0:
+                    letter_index_j -=1
+                keyboard_selection_frames=0
+            #new_frame[:] = (255, 0, 0)
+            #pag.moveRel(-drag, 0)
+            #cv2.putText(frame, "LEFT", (50, 100), font, 2, (0, 0, 255), 3)
         if dir1 == 'UP' :
-            pag.moveRel(0, -drag)
-            cv2.putText(frame, "UP", (150, 100), font, 2, (0, 0, 255), 3)
+            keyboard_selection_frames += 1
+            # If Kept gaze on one side more than 15 frames, move to keyboard
+            if keyboard_selection_frames == 9:
+                cv2.putText(frame, "UP", (50, 100), font, 2, (0, 0, 255), 3)
+                if letter_index_i > 0:
+                    letter_index_i -=1
+                keyboard_selection_frames=0
+            #pag.moveRel(0, -drag)
+            #cv2.putText(frame, "UP", (150, 100), font, 2, (0, 0, 255), 3)
         elif dir1 == 'DOWN' :
-            pag.moveRel(0, drag)
-            cv2.putText(frame, "DOWN", (150, 100), font, 2, (0, 0, 255), 3)
+            keyboard_selection_frames += 1
+            # If Kept gaze on one side more than 15 frames, move to keyboard
+            if keyboard_selection_frames == 9:
+                cv2.putText(frame, "DOWN", (50, 100), font, 2, (0, 0, 255), 3)
+                if letter_index_i < 2:
+                    letter_index_i +=1
+                keyboard_selection_frames=0
+            #pag.moveRel(0, drag)
+            #cv2.putText(frame, "DOWN", (150, 100), font, 2, (0, 0, 255), 3)
         
        
         
@@ -273,28 +309,30 @@ while True:
 
 
     # Letters
-    if frames == 10:
-        letter_index += 1
-        frames = 0
-    if letter_index == 15:
-        letter_index = 0
+    #if frames == 10:
+    #    letter_index += 1
+    #    frames = 0
+    #if letter_index == 15:
+    #    letter_index = 0
 
 
-    for i in range(15):
-        if i == letter_index:
-            light = True
-        else:
-            light = False
-        letter(i, keys_set_1[i], light)
+    for i in range(3):
+        for j in range(5) :
+            if i == letter_index_i and j==letter_index_j:
+                light = True
+            else:
+                light = False
+            letter(i,j, key_arr_1[i][j], light)
 
 
 
     cv2.imshow("Frame", frame)
+    cv2.imshow("Virtual keyboard", keyboard)
    
     
 
    # cv2.imshow("New frame", new_frame)
-   # cv2.imshow("Virtual keyboard", keyboard)
+   
    # cv2.putText(frame, text, (90, 60), cv2.FONT_HERSHEY_DUPLEX, 1.6, (147, 58, 31), 2)
 
     
