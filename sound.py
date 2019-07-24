@@ -151,6 +151,7 @@ keyboard_selection_frames = 0
 blinking_frames = 0
 frames_to_blink = 6
 
+
 text = ""
 
 while True:
@@ -245,9 +246,9 @@ while True:
             keyboard_selection_frames += 1
             # If Kept gaze on one side more than 9 frames, move to keyboard
             if keyboard_selection_frames == 9:
-                print("Right"+str(gaze_ratio))
+                print("Right"+str(gaze_ratio)+" "+str(blinking_ratio))
                 cv2.putText(frame, "RIGHT", (50, 100), font, 2, (0, 0, 255), 3)
-                if letter_index_j < 9:
+                if letter_index_j < 9 and blinking_ratio < 5:
                     letter_index_j += 1
                 keyboard_selection_frames = 0
             
@@ -255,9 +256,9 @@ while True:
             keyboard_selection_frames += 1
             # If Kept gaze on one side more than 9 frames, move to keyboard
             if keyboard_selection_frames == 9:
-                print("LEFT"+str(gaze_ratio))
+                print("LEFT"+str(gaze_ratio)+" "+str(blinking_ratio))
                 cv2.putText(frame, "LEFT", (50, 100), font, 2, (0, 0, 255), 3)
-                if letter_index_j > 0:
+                if letter_index_j > 0 and blinking_ratio < 5:
                     letter_index_j -= 1
                 keyboard_selection_frames = 0
         elif gaze_ratio >= 0.8 and gaze_ratio < 1.5:
@@ -266,9 +267,9 @@ while True:
                 keyboard_selection_frames += 1
                 # If Kept gaze on one side more than 9 frames, move to keyboard
                 if keyboard_selection_frames == 9:
-                    print("UP"+str(gaze_ratio))
+                    print("UP"+str(gaze_ratio)+" "+str(blinking_ratio))
                     cv2.putText(frame, "UP", (50, 100), font, 2, (0, 0, 255), 3)
-                    if letter_index_i > 0:
+                    if letter_index_i > 0 and blinking_ratio < 5:
                         letter_index_i -= 1
                     keyboard_selection_frames = 0
                
@@ -276,9 +277,9 @@ while True:
                 keyboard_selection_frames += 1
                 # If Kept gaze on one side more than 9 frames, move to keyboard
                 if keyboard_selection_frames == 9:
-                    print("DOWN"+str(gaze_ratio))
+                    print("DOWN"+str(gaze_ratio)+" "+str(blinking_ratio))
                     cv2.putText(frame, "DOWN"+str(gaze_ratio), (50, 100), font, 2, (0, 0, 255), 3)
-                    if letter_index_i < 2:
+                    if letter_index_i < 2 and blinking_ratio < 5:
                         letter_index_i += 1
                     keyboard_selection_frames = 0
            
