@@ -138,7 +138,8 @@ def get_blinking_ratio(eye_points, facial_landmarks):
 
     hor_line_lenght = hypot((left_point[0] - right_point[0]), (left_point[1] - right_point[1]))
     ver_line_lenght = hypot((center_top[0] - center_bottom[0]), (center_top[1] - center_bottom[1]))
-
+    if ver_line_lenght == 0:
+        ver_line_lenght=1;
     ratio = hor_line_lenght / ver_line_lenght
     return ratio
 
@@ -260,7 +261,7 @@ while True:
             # If Kept gaze on one side more than 15 frames, move to keyboard
             if keyboard_selection_frames == 9:
                 cv2.putText(frame, "RIGHT", (50, 100), font, 2, (0, 0, 255), 3)
-                if letter_index_j < 5:
+                if letter_index_j < 4:
                     letter_index_j +=1
                 keyboard_selection_frames=0
             #pag.moveRel(drag, 0)
@@ -296,22 +297,23 @@ while True:
                 keyboard_selection_frames=0
             #pag.moveRel(0, drag)
             #cv2.putText(frame, "DOWN", (150, 100), font, 2, (0, 0, 255), 3)
-        
+            
         if blinking_ratio > 5:
-            # cv2.putText(frame, "BLINKING", (50, 150), font, 4, (255, 0, 0), thickness=3)
+                # cv2.putText(frame, "BLINKING", (50, 150), font, 4, (255, 0, 0), thickness=3)
             blinking_frames += 1
             frames -= 1
-
+            active_letter=key_arr_1[letter_index_i][letter_index_j]
                 # Typing letter
             if blinking_frames == frames_to_blink:
                 if active_letter != "<" and active_letter != "_":
                     text += active_letter
                 if active_letter == "_":
-                    text += " "
-                    select_keyboard_menu = True
-                    # time.sleep(1)
-            else:
-                    blinking_frames = 0
+                    text += " "    
+        else:
+            blinking_frames = 0    
+        
+             # Show the text we're writing on the board
+            cv2.putText(board, text, (80, 100), font, 9, 0, 3)
             
          
      
@@ -343,8 +345,7 @@ while True:
                 light = False
             letter(i,j, key_arr_1[i][j], light)
             
-     # Show the text we're writing on the board
-    cv2.putText(board, text, (80, 100), font, 9, 0, 3)
+    
 
 
     cv2.imshow("Frame", frame)
