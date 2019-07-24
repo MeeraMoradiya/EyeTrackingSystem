@@ -206,11 +206,34 @@ while True:
 
         if mid_point.size > 1:
             dir1 = direction(mid_point, frame_eye, w, h)
+            
+            
+        if blinking_ratio > 5.7:
+            
+            blinking_frames += 1
+            frames -= 1
+            active_letter = key_arr_1[letter_index_i][letter_index_j]
+            keyboard_selection_frames = 0
+            # Typing letter
+            if blinking_frames == frames_to_blink:
+                if active_letter != "<" and active_letter != "_" and active_letter != "*":
+                    text += active_letter
+                if active_letter == "_":
+                    text += " "
+                if active_letter == "*":
+                    speaker.Speak(text) 
+                
+                winsound.PlaySound("SystemExclamation", winsound.SND_ALIAS)
+               
+        else:
+            blinking_frames = 0
+            # Show the text we're writing on the board
+            cv2.putText(board, text, (80, 100), font, 9, 0, 3)
 
         if gaze_ratio <= 1:
             keyboard_selection_frames += 1
             # If Kept gaze on one side more than 9 frames, move to keyboard
-            if keyboard_selection_frames == 9:
+            if keyboard_selection_frames == 7:
                 cv2.putText(frame, "RIGHT", (50, 100), font, 2, (0, 0, 255), 3)
                 if letter_index_j < 9:
                     letter_index_j += 1
@@ -219,7 +242,7 @@ while True:
         elif gaze_ratio > 1.7:
             keyboard_selection_frames += 1
             # If Kept gaze on one side more than 9 frames, move to keyboard
-            if keyboard_selection_frames == 9:
+            if keyboard_selection_frames == 7:
                 cv2.putText(frame, "LEFT", (50, 100), font, 2, (0, 0, 255), 3)
                 if letter_index_j > 0:
                     letter_index_j -= 1
@@ -228,7 +251,7 @@ while True:
         if dir1 == 'UP':
             keyboard_selection_frames += 1
             # If Kept gaze on one side more than 9 frames, move to keyboard
-            if keyboard_selection_frames == 9:
+            if keyboard_selection_frames == 7:
                 cv2.putText(frame, "UP", (50, 100), font, 2, (0, 0, 255), 3)
                 if letter_index_i > 0:
                     letter_index_i -= 1
@@ -237,33 +260,14 @@ while True:
         elif dir1 == 'DOWN':
             keyboard_selection_frames += 1
             # If Kept gaze on one side more than 9 frames, move to keyboard
-            if keyboard_selection_frames == 9:
+            if keyboard_selection_frames == 7:
                 cv2.putText(frame, "DOWN", (50, 100), font, 2, (0, 0, 255), 3)
                 if letter_index_i < 2:
                     letter_index_i += 1
                 keyboard_selection_frames = 0
            
 
-        if blinking_ratio > 5:
-            
-            blinking_frames += 1
-            frames -= 1
-            active_letter = key_arr_1[letter_index_i][letter_index_j]
-            # Typing letter
-            if blinking_frames == frames_to_blink:
-                if active_letter != "<" and active_letter != "_":
-                    text += active_letter
-                if active_letter == "_":
-                    text += " "
-                if active_letter == "*":
-                    speaker.Speak(text) 
-                winsound.PlaySound("SystemExclamation", winsound.SND_ALIAS)
-               
-        else:
-            blinking_frames = 0
-
-            # Show the text we're writing on the board
-            cv2.putText(board, text, (80, 100), font, 9, 0, 3)
+        
 
         cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
         cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31),
@@ -284,7 +288,7 @@ while True:
     cv2.imshow("Virtual keyboard", keyboard)
     cv2.imshow("Board", board)
 
-   
+
 
     key = cv2.waitKey(1)
     if key == 27:
