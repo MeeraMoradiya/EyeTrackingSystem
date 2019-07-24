@@ -5,7 +5,14 @@ from gaze_tracking import GazeTracking
 import pyautogui as pag
 from math import hypot
 from numpy import array
-import subprocess
+import time
+import win32com.client 
+import winsound
+
+# Load sounds
+#sound = pyglet.media.load("sound.wav", streaming=False)
+speaker = win32com.client.Dispatch("SAPI.SpVoice") 
+
 
 gaze = GazeTracking()
 webcam = cv2.VideoCapture(0)
@@ -21,7 +28,7 @@ keyboard = np.zeros((600, 2000, 3), np.uint8)
 # key_arr_1 = np.array([("Q", "W", "E", "R", "T"), ("A", "S", "D", "F", "G"), ("Z", "X", "C", "V", "<")])
 # key_arr_2 = np.array([("Y", "U", "I", "O", "P"), ("H", "J", "K", "L", "_"), ("V", "B", "N", "M", "<")])
 
-key_arr_1 = np.array([("Q", "W", "E", "R", "T","Y","U","I","O","P"), ("A", "S", "D", "F", "G","H","J","K","L",""), ("Z", "X", "C", "V","B","N","M", "<","","")])
+key_arr_1 = np.array([("Q", "W", "E", "R", "T","Y","U","I","O","P"), ("A", "S", "D", "F", "G","H","J","K","L",""), ("Z", "X", "C", "V","B","N","M", "<","?","")])
 
 
 # keys_set_1 = {0: "Q", 1: "W", 2: "E", 3: "R", 4: "T",
@@ -354,6 +361,11 @@ while True:
                     text += active_letter
                 if active_letter == "_":
                     text += " "
+                if active_letter == "E":
+                    speaker.Speak(text) 
+                winsound.PlaySound("SystemExclamation", winsound.SND_ALIAS)
+                #sound.play()                   
+                #time.sleep(1)
         else:
             blinking_frames = 0
 
@@ -378,6 +390,7 @@ while True:
     cv2.imshow("Virtual keyboard", keyboard)
     cv2.imshow("Board", board)
 
+    
 
     key = cv2.waitKey(1)
     if key == 27:

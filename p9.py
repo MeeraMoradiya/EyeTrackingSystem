@@ -6,9 +6,9 @@ import pyglet
 import time
 
 # Load sounds
-#sound = pyglet.media.load("sound.wav", streaming=False)
-#left_sound = pyglet.media.load("left.wav", streaming=False)
-#right_sound = pyglet.media.load("right.wav", streaming=False)
+sound = pyglet.media.load("sound.wav", streaming=False)
+left_sound = pyglet.media.load("left.wav", streaming=False)
+right_sound = pyglet.media.load("right.wav", streaming=False)
 
 cap = cv2.VideoCapture(0)
 board = np.zeros((300, 1400), np.uint8)
@@ -238,7 +238,7 @@ while True:
                 # If Kept gaze on one side more than 15 frames, move to keyboard
                 if keyboard_selection_frames == 15:
                     select_keyboard_menu = False
-                    #right_sound.play()
+                    right_sound.play()
                     # Set frames count to 0 when keyboard selected
                     frames = 0
                     keyboard_selection_frames = 0
@@ -251,7 +251,7 @@ while True:
                 # If Kept gaze on one side more than 15 frames, move to keyboard
                 if keyboard_selection_frames == 15:
                     select_keyboard_menu = False
-                    #left_sound.play()
+                    left_sound.play()
                     # Set frames count to 0 when keyboard selected
                     frames = 0
                 if keyboard_selected != last_keyboard_selected:
@@ -275,7 +275,7 @@ while True:
                         text += active_letter
                     if active_letter == "_":
                         text += " "
-                    #sound.play()
+                    sound.play()
                     select_keyboard_menu = True
                     # time.sleep(1)
 
@@ -286,20 +286,10 @@ while True:
     # Display letters on the keyboard
     if select_keyboard_menu is False:
         if frames == frames_active_letter:
-            print(letter_index)
-            if gaze_ratio <= 0.9:
-                letter_index += 1
-                
-                print('Right')
-            #time.sleep(2)
-            elif gaze_ratio > 1.7 :
-                if letter_index != 0 :
-                    letter_index -= 1
-                    
-                    print('Left')
-            #time.sleep(5)
-        
-       
+            letter_index += 1
+            frames = 0
+        if letter_index == 15:
+            letter_index = 0
         for i in range(15):
             if i == letter_index:
                 light = True
@@ -318,7 +308,7 @@ while True:
 
     cv2.imshow("Frame", frame)
     cv2.imshow("Virtual keyboard", keyboard)
-    #cv2.imshow("Board", board)
+    cv2.imshow("Board", board)
 
     key = cv2.waitKey(1)
     if key == 27:
