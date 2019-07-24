@@ -227,6 +227,10 @@ while True:
                     text += active_letter
                 if active_letter == "_":
                     text += " "
+                if active_letter == "<":
+                    temp = text
+                    text = temp[:-1]
+                    cv2.putText(board, "", (80, 100), font, 9, 0, 3)
                 if active_letter == "*":
                     speaker.Speak(text) 
                 
@@ -237,7 +241,7 @@ while True:
             # Show the text we're writing on the board
             cv2.putText(board, text, (80, 100), font, 9, 0, 3)
 
-        if gaze_ratio < 0.9:
+        if gaze_ratio < 0.8:
             keyboard_selection_frames += 1
             # If Kept gaze on one side more than 9 frames, move to keyboard
             if keyboard_selection_frames == 9:
@@ -256,7 +260,7 @@ while True:
                 if letter_index_j > 0:
                     letter_index_j -= 1
                 keyboard_selection_frames = 0
-        elif gaze_ratio >= 1 and gaze_ratio < 1.5:
+        elif gaze_ratio >= 0.8 and gaze_ratio < 1.5:
            
             if dir1 == 'UP':
                 keyboard_selection_frames += 1
