@@ -40,7 +40,7 @@ def direction(nose_point, anchor_point, w, h, multiple=1):
 
     if ny > y + multiple * h:
         return 'DOWN'
-    elif ny < y - multiple * h:
+    elif ny <= y - multiple * h:
         return 'UP'
 
     return '-'
@@ -162,7 +162,12 @@ while True:
 
     if first_frame is None:
         first_frame = frame
-        frame_eye = array(gaze.frame_left_coords(first_frame))
+        left_pupil = array(gaze.pupil_left_coords())
+        right_pupil = array(gaze.pupil_right_coords())
+        firstpointx = (left_pupil[0] + right_pupil[0]) / 2
+        firstpointy = (left_pupil[1] + right_pupil[1]) / 2
+        frame_eye = array([int(firstpointx), int(firstpointy)])
+        #frame_eye = array(gaze.frame_left_coords(first_frame))
         continue
 
     frame = gaze.annotated_frame()
@@ -197,15 +202,17 @@ while True:
         right_pupil = array(gaze.pupil_right_coords())
         w, h = 8, 8
         dir1 = ""
-        mid_point = array([900, 900])
+        mid_point = frame_eye
         if left_pupil.size > 1 and right_pupil.size > 1:
             midpointx = (left_pupil[0] + right_pupil[0]) / 2
             midpointy = (left_pupil[1] + right_pupil[1]) / 2
 
-            mid_point = array([midpointx, midpointy])
+            mid_point = array([int(midpointx), int(midpointy)])
 
         if mid_point.size > 1:
             dir1 = direction(mid_point, frame_eye, w, h)
+            cv2.line(frame, tuple(mid_point), tuple(frame_eye),(255, 0, 0), 2)
+            #cv2.line(frame, (900,900), tuple(frame_eye),(255, 0, 0), 2)
             
             
         if blinking_ratio > 5.7:
@@ -230,48 +237,52 @@ while True:
             # Show the text we're writing on the board
             cv2.putText(board, text, (80, 100), font, 9, 0, 3)
 
-        if gaze_ratio <= 1:
+        if gaze_ratio < 0.9:
             keyboard_selection_frames += 1
             # If Kept gaze on one side more than 9 frames, move to keyboard
-            if keyboard_selection_frames == 7:
+            if keyboard_selection_frames == 9:
+                print("Right"+str(gaze_ratio))
                 cv2.putText(frame, "RIGHT", (50, 100), font, 2, (0, 0, 255), 3)
                 if letter_index_j < 9:
                     letter_index_j += 1
                 keyboard_selection_frames = 0
             
-        elif gaze_ratio > 1.7:
+        elif gaze_ratio > 1.5:
             keyboard_selection_frames += 1
             # If Kept gaze on one side more than 9 frames, move to keyboard
-            if keyboard_selection_frames == 7:
+            if keyboard_selection_frames == 9:
+                print("LEFT"+str(gaze_ratio))
                 cv2.putText(frame, "LEFT", (50, 100), font, 2, (0, 0, 255), 3)
                 if letter_index_j > 0:
                     letter_index_j -= 1
                 keyboard_selection_frames = 0
+        elif gaze_ratio >= 1 and gaze_ratio < 1.5:
            
-        if dir1 == 'UP':
-            keyboard_selection_frames += 1
-            # If Kept gaze on one side more than 9 frames, move to keyboard
-            if keyboard_selection_frames == 7:
-                cv2.putText(frame, "UP", (50, 100), font, 2, (0, 0, 255), 3)
-                if letter_index_i > 0:
-                    letter_index_i -= 1
-                keyboard_selection_frames = 0
-           
-        elif dir1 == 'DOWN':
-            keyboard_selection_frames += 1
-            # If Kept gaze on one side more than 9 frames, move to keyboard
-            if keyboard_selection_frames == 7:
-                cv2.putText(frame, "DOWN", (50, 100), font, 2, (0, 0, 255), 3)
-                if letter_index_i < 2:
-                    letter_index_i += 1
-                keyboard_selection_frames = 0
+            if dir1 == 'UP':
+                keyboard_selection_frames += 1
+                # If Kept gaze on one side more than 9 frames, move to keyboard
+                if keyboard_selection_frames == 9:
+                    print("UP"+str(gaze_ratio))
+                    cv2.putText(frame, "UP", (50, 100), font, 2, (0, 0, 255), 3)
+                    if letter_index_i > 0:
+                        letter_index_i -= 1
+                    keyboard_selection_frames = 0
+               
+            elif dir1 == 'DOWN':
+                keyboard_selection_frames += 1
+                # If Kept gaze on one side more than 9 frames, move to keyboard
+                if keyboard_selection_frames == 9:
+                    print("DOWN"+str(gaze_ratio))
+                    cv2.putText(frame, "DOWN"+str(gaze_ratio), (50, 100), font, 2, (0, 0, 255), 3)
+                    if letter_index_i < 2:
+                        letter_index_i += 1
+                    keyboard_selection_frames = 0
            
 
         
 
         cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
-        cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31),
-                    1)
+        cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
         cv2.putText(frame, "direction: " + str(dir1), (90, 255), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
 
        
