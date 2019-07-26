@@ -230,8 +230,10 @@ while True:
                     text += " "
                 if active_letter == "<":
                     temp = text
-                    text = temp[:-1]
-                    cv2.putText(board, "", (80, 100), font, 9, 0, 3)
+                    c = text[-1:]
+                    text = text[:-1]
+                    
+                    cv2.putText(board, temp, (80, 100), font, 9,(255,255,255), 3)
                 if active_letter == "*":
                     speaker.Speak(text) 
                 
