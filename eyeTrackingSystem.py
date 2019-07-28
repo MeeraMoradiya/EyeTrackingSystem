@@ -25,11 +25,11 @@ first_frame = None
 
 
 # Keyboard settings
-keyboard = np.zeros((300, 1000, 3), np.uint8)
+keyboard = np.zeros((400, 1100, 4), np.uint8)
 
-
-key_arr_1 = np.array([("Q", "W", "E", "R", "T","Y","U","I","O","P"), ("A", "S", "D", "F", "G","H","J","K","L",""), ("Z", "X", "C", "V","B","N","M", "<","*","")])
-
+key_arr_1 = np.array(
+    [("1", "2", "3", "4", "5", "6", "7", "8", "9", "0","."),("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P","?"),
+     ("A", "S", "D", "F", "G", "H", "J", "K", "L", "'"," "), ("Z", "X", "C", "V", "B", "N", "M", "<", "CL","*","EN")])
 
 
 def direction(nose_point, anchor_point, w, h, multiple=1):
@@ -173,7 +173,7 @@ while True:
 
     frame = gaze.annotated_frame()
 
-    keyboard[:] = (0, 0, 0)
+    keyboard[:] = (0, 0, 0, 0)
     frames += 1
 
     new_frame = np.zeros((500, 500, 3), np.uint8)
@@ -224,16 +224,15 @@ while True:
             keyboard_selection_frames = 0
             # Typing letter
             if blinking_frames == frames_to_blink:
-                if active_letter != "<" and active_letter != "_" and active_letter != "*":
+                if active_letter != "<" and active_letter != "*" and active_letter !="CL":
                     text += active_letter
-                if active_letter == "_":
-                    text += " "
+               
                 if active_letter == "<":
                     temp = text
                     c = text[-1:]
                     text = text[:-1]    
                     cv2.putText(board, temp, (80, 100), font, 9,(255,255,255), 3)
-                if active letter =="CL"
+                if active_letter =="CL":
                     cv2.putText(board, text, (80, 100), font, 9,(255,255,255), 3)
                     text = ""
                 if active_letter == "*":
@@ -253,7 +252,7 @@ while True:
             if keyboard_selection_frames == 9:
                 print("Right"+str(gaze_ratio)+" "+str(blinking_ratio))
                 cv2.putText(frame, "RIGHT", (50, 100), font, 2, (0, 0, 255), 3)
-                if letter_index_j < 9 and blinking_ratio < 5:
+                if letter_index_j < 10 and blinking_ratio < 5:
                     letter_index_j += 1
                 keyboard_selection_frames = 0
             
@@ -284,7 +283,7 @@ while True:
                 if keyboard_selection_frames == 9:
                     print("DOWN"+str(gaze_ratio)+" "+str(blinking_ratio))
                     cv2.putText(frame, "DOWN"+str(gaze_ratio), (50, 100), font, 2, (0, 0, 255), 3)
-                    if letter_index_i < 2 and blinking_ratio < 5:
+                    if letter_index_i < 3 and blinking_ratio < 5:
                         letter_index_i += 1
                     keyboard_selection_frames = 0
            
@@ -297,8 +296,8 @@ while True:
 
        
 
-    for i in range(3):
-        for j in range(10):
+    for i in range(4):
+        for j in range(11):
             if i == letter_index_i and j == letter_index_j:
                 light = True
             else:
