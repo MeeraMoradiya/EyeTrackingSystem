@@ -213,7 +213,7 @@ while True:
 
         if mid_point.size > 1:
             dir1 = direction(mid_point, frame_eye, w, h)
-            cv2.line(frame, tuple(mid_point), tuple(frame_eye), (255, 0, 0), 2)
+          #  cv2.line(frame, tuple(mid_point), tuple(frame_eye), (255, 0, 0), 2)
             # cv2.line(frame, (900,900), tuple(frame_eye),(255, 0, 0), 2)
 
         if blinking_ratio > 5.7:
