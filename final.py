@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import dlib
 from gaze_tracking import GazeTracking
-import pyautogui as pag
 from math import hypot
 from numpy import array
 import win32com.client
