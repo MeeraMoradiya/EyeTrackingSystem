@@ -31,5 +31,9 @@ This file is just to detect eye to learn basics of eye detection
 <br>eye_motion_tracking.py</br>
 To learn how to convert image into grey scale image using threshold by using opencv functions
 
+## Licence
+
+MIT
+
  
 
