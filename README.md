@@ -18,6 +18,7 @@ winsound<br>
 
 Execute below command to run the application<br>
 ~~~
+pip install -r requirements.txt
 python final.py
 ~~~
 
